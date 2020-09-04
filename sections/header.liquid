@@ -299,7 +299,7 @@
   </header>
 
   <h2>
-    hello from master branch</h2>
+    hello from saiful branch</h2>
 
   {% if section.settings.align_logo == 'center' %}
     <nav class="small--hide border-bottom" id="AccessibleNav" role="navigation">
@@ -312,16 +312,13 @@
 <script type="application/ld+json">
 
 [36mLine: 1[0m
-[31m{[0m
-[31m    "@context": "http://schema.org",[0m
-[31m    "@type": "Organization",[0m
-[31m    "name": {{ shop.name | json }},{% if section.settings.logo %}[0m
-[31m        {% assign image_size = section.settings.logo.width | append:'x' %}[0m
-[31m        "logo" : {{ section.settings.logo | img_url: image_size | prepend: "https:" | json }},{% endif %}[0m
-[31m    "sameAs": [[0m
-
-[36mLine: 20[0m
-[32m(empty line)[0m
+[31m[36 mLine : 1 [[0m
+[31m        0 m [[0m
+[31m            31 m {[0m
+[31m                [[0m
+[31m                    0 m [[0m
+[31m                        31 m "@context" : "http://schema.org",[0m
+[31m                        [[0m
 </script>
 
 {% if request.page_type == 'index' %}
@@ -329,16 +326,13 @@
   <script type="application/ld+json">
 
 [36mLine: 1[0m
-[31m{[0m
-[31m    "@context": "http://schema.org",[0m
-[31m    "@type": "WebSite",[0m
-[31m    "name": {{ shop.name | json }},[0m
-[31m    "potentialAction": {[0m
-[31m        "@type": "SearchAction",[0m
-[31m        "target": {{ potential_action_target | json }},[0m
-
-[36mLine: 13[0m
-[32m(empty line)[0m
+[31m[36 mLine : 1 [[0m
+[31m        0 m [[0m
+[31m            31 m {[0m
+[31m                [[0m
+[31m                    0 m [[0m
+[31m                        31 m "@context" : "http://schema.org",[0m
+[31m                        [[0m
 </script>
 {% endif %}
 
