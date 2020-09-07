@@ -143,9 +143,9 @@
       {%- for block in section.blocks -%}
 
         <div class="site-footer__item
-                                                  {% if section.blocks.size == 1 %} site-footer__item--center{% endif %}
-                                                  {{ footer_item }}
-                                                  {% if block.type == 'newsletter' and section.blocks.size == 3 %}site-footer-newsletter__one-half{% endif %}" {{ block.shopify_attributes }}>
+                                                            {% if section.blocks.size == 1 %} site-footer__item--center{% endif %}
+                                                            {{ footer_item }}
+                                                            {% if block.type == 'newsletter' and section.blocks.size == 3 %}site-footer-newsletter__one-half{% endif %}" {{ block.shopify_attributes }}>
           <div class="site-footer__item-inner site-footer__item-inner--{{ block.type }}">
 
             {%- if block.settings.title -%}
@@ -155,7 +155,7 @@
             {%- case block.type -%}
               {%- when 'newsletter' -%}
                 <div class="site-footer__newsletter
-                                                                                      {% if section.blocks.size == 1 %} site-footer__single-block--centered{% endif %}">
+                                                                                                          {% if section.blocks.size == 1 %} site-footer__single-block--centered{% endif %}">
                   {%- assign formId = 'ContactFooter' -%}
                   {% form 'customer', id: formId, novalidate: 'novalidate' %}
                     {%- if form.posted_successfully? -%}
@@ -187,7 +187,7 @@
               {%- when 'text' -%}
                 {%- if block.settings.text != blank -%}
                   <div class="site-footer__rte
-                                                                                                {% if section.blocks.size == 1 %} site-footer__single-block--centered{% endif %}">
+                                                                                                                      {% if section.blocks.size == 1 %} site-footer__single-block--centered{% endif %}">
                     {{ block.settings.text }}
                   </div>
                 {%- endif -%}
@@ -195,7 +195,7 @@
               {%- when 'link_list' -%}
                 {%- assign footer_linklist = block.settings.menu -%}
                 <ul class="site-footer__linklist
-                                                                                        {% if inline_list %}list--inline{% endif %}">
+                                                                                                            {% if inline_list %}list--inline{% endif %}">
                   {%- for link in linklists[footer_linklist].links -%}
                     <li class="site-footer__linklist-item">
                       <a href="{{ link.url }}" {% if link.current %} aria-current="page" {% endif %}>
@@ -340,12 +340,6 @@
     </div>
   </div>
 </footer>
-
-<h3>greetings from branch saiful.</h3>
-<h3>greetings from branch saiful.</h3>
-<h3>greetings from branch saiful.</h3>
-<h3>greetings from branch saiful.</h3>
-<h3>greetings from branch saiful.</h3>
 
 {% schema %}
 
