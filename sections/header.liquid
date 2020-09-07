@@ -1,35 +1,17 @@
 {% if section.settings.message %}
   <style>
-  {
-    % if section.settings.logo !=blank %
-  }
-
-  .site-header__logo-image {
-    max-width: {
-        {
-        section.settings.logo_max_width | escape
+    {% if section.settings.logo != blank %}
+      .site-header__logo-image {
+        max-width: {{ section.settings.logo_max_width | escape }}px;
       }
-    }
+    {% endif %}
 
-    px;
-  }
-
-    {
-    % endif %
-  }
-
-    {
-    % if section.settings.align_logo=='left'%
-  }
-
-  .site-header__logo-image {
-    margin: 0;
-  }
-
-    {
-    % endif %
-  }
-</style>
+    {% if section.settings.align_logo == 'left' %}
+      .site-header__logo-image {
+        margin: 0;
+      }
+    {% endif %}
+  </style>
 {% endif %}
 
 {% include 'search-drawer' %}
@@ -38,82 +20,36 @@
   {% if section.settings.message %}
     {% if section.settings.home_page_only == false or request.page_type == 'index' %}
       <style>
-    .announcement-bar {
-      background-color: {
-          {
-          section.settings.color_bg
+        .announcement-bar {
+          background-color: {{ section.settings.color_bg }};
         }
-      }
 
-      ;
-    }
+        .announcement-bar__link:hover {
+          {% assign brightness = section.settings.color_bg | color_brightness %}
 
-    .announcement-bar--link:hover {
-        {
-        % assign brightness=section.settings.color_bg | color_brightness %
-      }
-
-        {
-        % if brightness <=192 %
-      }
-
-        {
-        % assign lightenAmount=255 | minus: brightness | divided_by: 255 | times: 16 %
-      }
-
-      background-color: {
-          {
-          section.settings.color_bg | color_lighten: lightenAmount
-        }
-      }
-
-      ;
-
-        {
-        % else %
-      }
-
-        {
-        % assign darkenAmount=255 | divided_by: brightness | times: 8 %
-      }
-
-      background-color: {
-          {
-          section.settings.color_bg | color_darken: darkenAmount
-        }
-      }
-
-      ;
-
-        {
-        % endif %
-      }
-    }
-
-    .announcement-bar__message {
-      color: {
-          {
-          section.settings.color_text
-        }
-      }
-
-      ;
-    }
-  </style>
-
-      {% if section.settings.message_link == blank %}
-        <div class="announcement-bar">
-        {% else %}
-          <a href="{{ section.settings.message_link }}" class="announcement-bar announcement-bar--link">
+          {% if brightness <= 192 %}
+            {% assign lightenAmount = 255 | minus: brightness | divided_by: 255 | times: 16 %}
+            background-color: {{ section.settings.color_bg | color_lighten: lightenAmount }};
+          {% else %}
+            {% assign darkenAmount = 255 | divided_by: brightness | times: 8 %}
+            background-color: {{ section.settings.color_bg | color_darken: darkenAmount }};
           {% endif %}
+        }
 
+        .announcement-bar__message {
+          color: {{ section.settings.color_text }};
+        }
+      </style>
+
+      <div class="announcement-bar" role="region" aria-label="{{ 'sections.header.announcement_bar_label' | t }}">
+        {%- unless section.settings.message_link == blank -%}
+          <a href="{{ section.settings.message_link }}" class="announcement-bar__link">
+          {%- endunless -%}
           <p class="announcement-bar__message">{{ section.settings.message_text | escape }}</p>
-
-          {% if section.settings.message_link == blank %}
-          </div>
-      {% else %}
-        </a>
-      {% endif %}
+          {%- unless section.settings.message_link == blank -%}
+          </a>
+        {%- endunless -%}
+      </div>
 
     {% endif %}
   {% endif %}
@@ -128,8 +64,8 @@
 
       <div class="grid__item {{ logo_classes }}">
         {% comment %}
-        Use the uploaded logo from theme settings if enabled.
-        Site name gets precedence with H1 tag on homepage, div on other pages.
+          Use the uploaded logo from theme settings if enabled.
+          Site name gets precedence with H1 tag on homepage, div on other pages.
         {% endcomment %}
         {% if request.page_type == 'index' %}
           <h1 class="h2 site-header__logo">
@@ -298,428 +234,429 @@
     </nav>
   </header>
 
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <i class="fas fa-user"></i>
+      </div>
+    </div>
+  </div>
 
   {% if section.settings.align_logo == 'center' %}
     <nav class="small--hide border-bottom" id="AccessibleNav" role="navigation">
       {% include 'site-nav', linklist: section.settings.main_linklist, wrapper_class: 'site-nav--centered' %}
     </nav>
-
   {% endif %}
 </div>
 
 
 <script type="application/ld+json">
 
-[36mLine: 1[0m
-[31m[36 mLine : 2 [[0m
-[31m        0 m [[0m
-[31m            31 m(empty line)[[0m
-[31m                0 m [[0m
-[31m                    31 m[[0m
-[31m                        36 mLine : 1 [[0m
-[31m                            0 m[[0m
+
+[36mLine: 2[0m
+[31m(empty line)[0m
+[31m(empty line)[0m
+[31m[36mLine: 1[0m[0m
+[31m[31m[36 mLine : 1 [[0m[0m
+[31m[31m        0 m [[0m[0m
+[31m[31m            31 m {[0m[0m
+[31m[31m                [[0m[0m
+
 </script>
 
 {% if request.page_type == 'index' %}
   {% assign potential_action_target = shop.url | append: routes.search_url | append: "?q={search_term_string}" %}
   <script type="application/ld+json">
 
-[36mLine: 1[0m
-[31m[36 mLine : 2 [[0m
-[31m        0 m [[0m
-[31m            31 m(empty line)[[0m
-[31m                0 m [[0m
-[31m                    31 m[[0m
-[31m                        36 mLine : 1 [[0m
-[31m                            0 m[[0m
+
+[36mLine: 2[0m
+[31m(empty line)[0m
+[31m(empty line)[0m
+[31m[36mLine: 1[0m[0m
+[31m[31m[36 mLine : 1 [[0m[0m
+[31m[31m        0 m [[0m[0m
+[31m[31m            31 m {[0m[0m
+[31m[31m                [[0m[0m
+
 </script>
 {% endif %}
 
 {% schema %}
+
 {
-"name": {
-"da": "Overskrift",
-"de": "Titel",
-"en": "Header",
-"es": "Encabezado",
-"fi": "Ylätunniste",
-"fr": "En-tête",
-"hi": "हैडर",
-"it": "Header",
-"ja": "ヘッダー",
-"ko": "머리글",
-"nb": "Header",
-"nl": "Koptekst",
-"pt-BR": "Cabeçalho",
-"pt-PT": "Cabeçalho",
-"sv": "Rubrik",
-"th": "ส่วนหัว",
-"zh-CN": "标头",
-"zh-TW": "標頭"
-},
-"settings": [
-{
-"type": "radio",
-"id": "align_logo",
-"label": {
-"da": "Logojustering",
-"de": "Logo-Ausrichtung",
-"en": "Logo alignment",
-"es": "Alineación de logo",
-"fi": "Logon tasaus",
-"fr": "Alignement du logo",
-"hi": "लोगो संरेखण",
-"it": "Allineamento logo",
-"ja": "ロゴアラインメント",
-"ko": "로고 정렬",
-"nb": "Logojustering",
-"nl": "Logo-uitlijning",
-"pt-BR": "Alinhamento do logotipo",
-"pt-PT": "Alinhamento do logótipo",
-"sv": "Logojustering",
-"th": "การจัดวางโลโก้",
-"zh-CN": "logo 对齐方式",
-"zh-TW": "商標對齊"
-},
-"default": "left",
-"options": [
-{
-"value": "left",
-"label": {
-"da": "Venstre",
-"de": "Links",
-"en": "Left",
-"es": "Izquierda",
-"fi": "Vasen",
-"fr": "Gauche",
-"hi": "बाएँ",
-"it": "Sinistra",
-"ja": "左",
-"ko": "왼쪽",
-"nb": "Venstre",
-"nl": "Links",
-"pt-BR": "Esquerda",
-"pt-PT": "Esquerda",
-"sv": "Vänster",
-"th": "ด้านซ้าย",
-"zh-CN": "左侧",
-"zh-TW": "左方"
+  "name": {
+    "da": "Overskrift",
+    "de": "Titel",
+    "en": "Header",
+    "es": "Encabezado",
+    "fi": "Ylätunniste",
+    "fr": "En-tête",
+    "hi": "हैडर",
+    "it": "Header",
+    "ja": "ヘッダー",
+    "ko": "헤더",
+    "nb": "Header",
+    "nl": "Koptekst",
+    "pt-BR": "Cabeçalho",
+    "pt-PT": "Cabeçalho",
+    "sv": "Rubrik",
+    "th": "ส่วนหัว",
+    "zh-CN": "标头",
+    "zh-TW": "標頭"
+  },
+  "settings": [
+    {
+      "type": "radio",
+      "id": "align_logo",
+      "label": {
+        "da": "Logojustering",
+        "de": "Logo-Ausrichtung",
+        "en": "Logo alignment",
+        "es": "Alineación de logo",
+        "fi": "Logon tasaus",
+        "fr": "Alignement du logo",
+        "hi": "लोगो संरेखण",
+        "it": "Allineamento logo",
+        "ja": "ロゴアラインメント",
+        "ko": "로고 정렬",
+        "nb": "Logojustering",
+        "nl": "Logo-uitlijning",
+        "pt-BR": "Alinhamento do logotipo",
+        "pt-PT": "Alinhamento do logótipo",
+        "sv": "Logojustering",
+        "th": "การจัดวางโลโก้",
+        "zh-CN": "logo 对齐方式",
+        "zh-TW": "商標對齊"
+      },
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": {
+            "da": "Venstre",
+            "de": "Links",
+            "en": "Left",
+            "es": "Izquierda",
+            "fi": "Vasen",
+            "fr": "Gauche",
+            "hi": "बाएँ",
+            "it": "Sinistra",
+            "ja": "左",
+            "ko": "왼쪽",
+            "nb": "Venstre",
+            "nl": "Links",
+            "pt-BR": "Esquerda",
+            "pt-PT": "Esquerda",
+            "sv": "Vänster",
+            "th": "ด้านซ้าย",
+            "zh-CN": "左侧",
+            "zh-TW": "左方"
+          }
+        }, {
+          "value": "center",
+          "label": {
+            "da": "Centreret",
+            "de": "Mittig",
+            "en": "Centered",
+            "es": "Centrada",
+            "fi": "Keskitetty",
+            "fr": "Centré",
+            "hi": "केंद्र",
+            "it": "Centrato",
+            "ja": "中央揃え",
+            "ko": "센터 맞추기",
+            "nb": "Sentrert",
+            "nl": "Gecentreerd",
+            "pt-BR": "Centralizado",
+            "pt-PT": "Centrado",
+            "sv": "Centrera",
+            "th": "ตรงกลาง",
+            "zh-CN": "居中",
+            "zh-TW": "置中"
+          }
+        }
+      ]
+    }, {
+      "type": "image_picker",
+      "id": "logo",
+      "label": {
+        "da": "Logobillede",
+        "de": "Logo-Foto",
+        "en": "Logo image",
+        "es": "Logo",
+        "fi": "Logokuva",
+        "fr": "Image du logo",
+        "hi": "लोगो इमेज",
+        "it": "Immagine del logo",
+        "ja": "ロゴ画像",
+        "ko": "로고 이미지",
+        "nb": "Logobilde",
+        "nl": "Afbeelding van logo",
+        "pt-BR": "Imagem do logotipo",
+        "pt-PT": "Imagem do logótipo",
+        "sv": "Logobild",
+        "th": "รูปภาพโลโก้",
+        "zh-CN": "logo 图片",
+        "zh-TW": "標誌圖片"
+      }
+    }, {
+      "type": "range",
+      "id": "logo_max_width",
+      "label": {
+        "da": "Tilpasset logobredde",
+        "de": "Logobreite",
+        "en": "Custom logo width",
+        "es": "Ancho del logo personalizado",
+        "fi": "Mukautetun logon leveys",
+        "fr": "Largeur personnalisée du logo",
+        "hi": "कस्टम लोगो की चौड़ाई",
+        "it": "Larghezza logo personalizzato",
+        "ja": "ロゴの幅をカスタマイズする",
+        "ko": "사용자 지정 로고 폭",
+        "nb": "Tilpasset logobredde",
+        "nl": "Aangepaste logo-breedte",
+        "pt-BR": "Largura do logotipo personalizado",
+        "pt-PT": "Largura de logótipo personalizada",
+        "sv": "Anpassad logotypsbredd",
+        "th": "ความกว้างของโลโก้แบบกำหนดเอง",
+        "zh-CN": "自定义 logo 宽度",
+        "zh-TW": "自訂商標寬度"
+      },
+      "min": 50,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "default": 100
+    }, {
+      "type": "link_list",
+      "id": "main_linklist",
+      "label": {
+        "da": "Menu",
+        "de": "Menü",
+        "en": "Menu",
+        "es": "Menú",
+        "fi": "Valikko",
+        "fr": "Menu",
+        "hi": "मेनू",
+        "it": "Menu",
+        "ja": "メニュー",
+        "ko": "메뉴",
+        "nb": "Meny",
+        "nl": "Menu",
+        "pt-BR": "Menu",
+        "pt-PT": "Menu",
+        "sv": "Meny",
+        "th": "เมนู",
+        "zh-CN": "菜单",
+        "zh-TW": "選單"
+      },
+      "default": "main-menu"
+    }, {
+      "type": "header",
+      "content": {
+        "da": "Meddelelseslinje",
+        "de": "Ankündigungsbereich",
+        "en": "Announcement bar",
+        "es": "Barra de anuncios",
+        "fi": "Ilmoituspalkki",
+        "fr": "Barre d'annonces",
+        "hi": "घोषणा बार",
+        "it": "Barra degli annunci",
+        "ja": "告知バー",
+        "ko": "공지 표시줄",
+        "nb": "Kunngjøringslinje",
+        "nl": "Aankondigingsbalk",
+        "pt-BR": "Barra de avisos",
+        "pt-PT": "Barra de comunicado",
+        "sv": "Meddelandefält",
+        "th": "แถบประกาศ",
+        "zh-CN": "公告栏",
+        "zh-TW": "公告列"
+      }
+    }, {
+      "type": "checkbox",
+      "id": "message",
+      "label": {
+        "da": "Vis meddelelse",
+        "de": "Ankündigung anzeigen",
+        "en": "Show announcement",
+        "es": "Mostrar anuncio",
+        "fi": "Näytä ilmoitus",
+        "fr": "Afficher l'annonce",
+        "hi": "घोषणा दिखाएं",
+        "it": "Mostra annuncio",
+        "ja": "告知を表示する",
+        "ko": "공지 표시",
+        "nb": "Vis kunngjøring",
+        "nl": "Aankondiging weergeven",
+        "pt-BR": "Exibir anúncio",
+        "pt-PT": "Mostrar comunicado",
+        "sv": "Visa tillkännagivande",
+        "th": "แสดงประกาศ",
+        "zh-CN": "显示公告",
+        "zh-TW": "顯示公告"
+      },
+      "default": false
+    }, {
+      "type": "checkbox",
+      "id": "home_page_only",
+      "label": {
+        "da": "Kun startside",
+        "de": "Nur Startseite",
+        "en": "Home page only",
+        "es": "Solo página de inicio",
+        "fi": "Vain etusivu",
+        "fr": "Page d'accueil uniquement",
+        "hi": "केवल होमपेज",
+        "it": "Solo home page",
+        "ja": "ホームページのみ",
+        "ko": "홈페이지만",
+        "nb": "Kun på startsiden",
+        "nl": "Alleen homepage",
+        "pt-BR": "Apenas na página inicial",
+        "pt-PT": "Apenas a página inicial",
+        "sv": "Endast hemsida",
+        "th": "หน้าแรกเท่านั้น",
+        "zh-CN": "仅主页",
+        "zh-TW": "僅限首頁"
+      },
+      "default": true
+    }, {
+      "type": "text",
+      "id": "message_text",
+      "label": {
+        "da": "Tekst",
+        "de": "Text",
+        "en": "Text",
+        "es": "Texto",
+        "fi": "Teksti",
+        "fr": "Texte",
+        "hi": "टेक्स्ट",
+        "it": "Testo",
+        "ja": "テキスト",
+        "ko": "텍스트",
+        "nb": "Tekst",
+        "nl": "Tekst",
+        "pt-BR": "Texto",
+        "pt-PT": "Texto",
+        "sv": "Text",
+        "th": "ข้อความ",
+        "zh-CN": "文本",
+        "zh-TW": "文字"
+      },
+      "default": {
+        "da": "Meddel noget her",
+        "de": "Hier etwas ankündigen",
+        "en": "Announce something here",
+        "es": "Anuncia algo aquí",
+        "fi": "Ilmoita jotakin tässä",
+        "fr": "Annoncez quelque chose ici",
+        "hi": "यहां कुछ घोषित करें",
+        "it": "Annuncia qualcosa qui",
+        "ja": "ここで告知してください",
+        "ko": "여기에 공지하십시오",
+        "nb": "Kunngjør noe her",
+        "nl": "Kondig hier iets aan",
+        "pt-BR": "Anuncie algo aqui",
+        "pt-PT": "Anunciar algo aqui",
+        "sv": "Meddela något här",
+        "th": "ประกาศข้อความที่นี่",
+        "zh-CN": "在此处进行公告",
+        "zh-TW": "在此公告資訊"
+      }
+    }, {
+      "type": "url",
+      "id": "message_link",
+      "label": {
+        "da": "Link",
+        "de": "Link",
+        "en": "Link",
+        "es": "Enlace",
+        "fi": "Linkki",
+        "fr": "Lien",
+        "hi": "लिंक",
+        "it": "Link",
+        "ja": "リンク",
+        "ko": "링크",
+        "nb": "Kobling",
+        "nl": "Link",
+        "pt-BR": "Link",
+        "pt-PT": "Ligação",
+        "sv": "Länk",
+        "th": "ลิงก์",
+        "zh-CN": "链接",
+        "zh-TW": "連結"
+      },
+      "info": {
+        "da": "Valgfri",
+        "de": "Optional",
+        "en": "Optional",
+        "es": "Opcional",
+        "fi": "Valinnainen",
+        "fr": "Facultatif",
+        "hi": "वैकल्पिक",
+        "it": "Facoltativo",
+        "ja": "オプション",
+        "ko": "선택 사항",
+        "nb": "Valgfritt",
+        "nl": "Optioneel",
+        "pt-BR": "Opcional",
+        "pt-PT": "Opcional",
+        "sv": "Valfritt",
+        "th": "ไม่จำเป็น",
+        "zh-CN": "可选",
+        "zh-TW": "(選填)"
+      }
+    }, {
+      "type": "color",
+      "id": "color_bg",
+      "label": {
+        "da": "Bjælke",
+        "de": "Zeile",
+        "en": "Bar",
+        "es": "Barra",
+        "fi": "Palkki",
+        "fr": "Barre",
+        "hi": "बार",
+        "it": "Barra",
+        "ja": "バー",
+        "ko": "바",
+        "nb": "Felt",
+        "nl": "Balk",
+        "pt-BR": "Barra",
+        "pt-PT": "Barra",
+        "sv": "Fält",
+        "th": "แถบ",
+        "zh-CN": "栏",
+        "zh-TW": "橫條"
+      },
+      "default": "#3a3a3a"
+    }, {
+      "type": "color",
+      "id": "color_text",
+      "label": {
+        "da": "Tekst",
+        "de": "Text",
+        "en": "Text",
+        "es": "Texto",
+        "fi": "Teksti",
+        "fr": "Texte",
+        "hi": "टेक्स्ट",
+        "it": "Testo",
+        "ja": "テキスト",
+        "ko": "텍스트",
+        "nb": "Tekst",
+        "nl": "Tekst",
+        "pt-BR": "Texto",
+        "pt-PT": "Texto",
+        "sv": "Text",
+        "th": "ข้อความ",
+        "zh-CN": "文本",
+        "zh-TW": "文字"
+      },
+      "default": "#ffffff"
+    }
+  ]
 }
-},
-{
-"value": "center",
-"label": {
-"da": "Centreret",
-"de": "Mittig",
-"en": "Centered",
-"es": "Centrada",
-"fi": "Keskitetty",
-"fr": "Centré",
-"hi": "केंद्र",
-"it": "Centrato",
-"ja": "中央揃え",
-"ko": "센터 맞추기",
-"nb": "Sentrert",
-"nl": "Gecentreerd",
-"pt-BR": "Centralizado",
-"pt-PT": "Centrado",
-"sv": "Centrera",
-"th": "ตรงกลาง",
-"zh-CN": "居中",
-"zh-TW": "置中"
-}
-}
-]
-},
-{
-"type": "image_picker",
-"id": "logo",
-"label": {
-"da": "Logobillede",
-"de": "Logo-Foto",
-"en": "Logo image",
-"es": "Logo",
-"fi": "Logokuva",
-"fr": "Image du logo",
-"hi": "लोगो इमेज",
-"it": "Immagine del logo",
-"ja": "ロゴ画像",
-"ko": "로고 이미지",
-"nb": "Logobilde",
-"nl": "Afbeelding van logo",
-"pt-BR": "Imagem do logotipo",
-"pt-PT": "Imagem do logótipo",
-"sv": "Logobild",
-"th": "รูปภาพโลโก้",
-"zh-CN": "logo 图片",
-"zh-TW": "標誌圖片"
-}
-},
-{
-"type": "range",
-"id": "logo_max_width",
-"label": {
-"da": "Tilpasset logobredde",
-"de": "Logobreite",
-"en": "Custom logo width",
-"es": "Ancho del logo personalizado",
-"fi": "Mukautetun logon leveys",
-"fr": "Largeur personnalisée du logo",
-"hi": "कस्टम लोगो की चौड़ाई",
-"it": "Larghezza logo personalizzato",
-"ja": "ロゴの幅をカスタマイズする",
-"ko": "사용자 지정 로고 폭",
-"nb": "Tilpasset logobredde",
-"nl": "Aangepaste logo-breedte",
-"pt-BR": "Largura do logotipo personalizado",
-"pt-PT": "Largura de logótipo personalizada",
-"sv": "Anpassad logotypsbredd",
-"th": "ความกว้างของโลโก้แบบกำหนดเอง",
-"zh-CN": "自定义 logo 宽度",
-"zh-TW": "自訂商標寬度"
-},
-"min": 50,
-"max": 250,
-"step": 5,
-"unit": "px",
-"default": 100
-},
-{
-"type": "link_list",
-"id": "main_linklist",
-"label": {
-"da": "Menu",
-"de": "Menü",
-"en": "Menu",
-"es": "Menú",
-"fi": "Valikko",
-"fr": "Menu",
-"hi": "मेनू",
-"it": "Menu",
-"ja": "メニュー",
-"ko": "메뉴",
-"nb": "Meny",
-"nl": "Menu",
-"pt-BR": "Menu",
-"pt-PT": "Menu",
-"sv": "Meny",
-"th": "เมนู",
-"zh-CN": "菜单",
-"zh-TW": "選單"
-},
-"default": "main-menu"
-},
-{
-"type": "header",
-"content": {
-"da": "Meddelelseslinje",
-"de": "Ankündigungsbereich",
-"en": "Announcement bar",
-"es": "Barra de anuncios",
-"fi": "Ilmoituspalkki",
-"fr": "Barre d'annonces",
-"hi": "घोषणा बार",
-"it": "Barra degli annunci",
-"ja": "告知バー",
-"ko": "공지 표시줄",
-"nb": "Kunngjøringslinje",
-"nl": "Aankondigingsbalk",
-"pt-BR": "Barra de avisos",
-"pt-PT": "Barra de comunicado",
-"sv": "Meddelandefält",
-"th": "แถบประกาศ",
-"zh-CN": "公告栏",
-"zh-TW": "公告列"
-}
-},
-{
-"type": "checkbox",
-"id": "message",
-"label": {
-"da": "Vis meddelelse",
-"de": "Ankündigung anzeigen",
-"en": "Show announcement",
-"es": "Mostrar anuncio",
-"fi": "Näytä ilmoitus",
-"fr": "Afficher l'annonce",
-"hi": "घोषणा डिखाएं",
-"it": "Mostra annuncio",
-"ja": "告知を表示する",
-"ko": "공지 표시",
-"nb": "Vis kunngjøring",
-"nl": "Aankondiging weergeven",
-"pt-BR": "Exibir anúncio",
-"pt-PT": "Mostrar comunicado",
-"sv": "Visa tillkännagivande",
-"th": "แสดงประกาศ",
-"zh-CN": "显示公告",
-"zh-TW": "顯示公告"
-},
-"default": false
-},
-{
-"type": "checkbox",
-"id": "home_page_only",
-"label": {
-"da": "Kun startside",
-"de": "Nur Startseite",
-"en": "Home page only",
-"es": "Solo página de inicio",
-"fi": "Vain etusivu",
-"fr": "Page d'accueil uniquement",
-"hi": "केवल होमपेज",
-"it": "Solo home page",
-"ja": "ホームページのみ",
-"ko": "홈페이지만",
-"nb": "Kun på startsiden",
-"nl": "Alleen homepage",
-"pt-BR": "Apenas na página inicial",
-"pt-PT": "Apenas a página inicial",
-"sv": "Endast hemsida",
-"th": "หน้าแรกเท่านั้น",
-"zh-CN": "仅主页",
-"zh-TW": "僅限首頁"
-},
-"default": true
-},
-{
-"type": "text",
-"id": "message_text",
-"label": {
-"da": "Tekst",
-"de": "Text",
-"en": "Text",
-"es": "Texto",
-"fi": "Teksti",
-"fr": "Texte",
-"hi": "टेक्स्ट",
-"it": "Testo",
-"ja": "テキスト",
-"ko": "텍스트",
-"nb": "Tekst",
-"nl": "Tekst",
-"pt-BR": "Texto",
-"pt-PT": "Texto",
-"sv": "Text",
-"th": "ข้อความ",
-"zh-CN": "文本",
-"zh-TW": "文字"
-},
-"default": {
-"da": "Meddel noget her",
-"de": "Hier etwas ankündigen",
-"en": "Announce something here",
-"es": "Anuncia algo aquí",
-"fi": "Ilmoita jotakin tässä",
-"fr": "Annoncez quelque chose ici",
-"hi": "यहां कुछ घोषित करें",
-"it": "Annuncia qualcosa qui",
-"ja": "ここで告知してください",
-"ko": "여기에 공지하십시오",
-"nb": "Kunngjør noe her",
-"nl": "Kondig hier iets aan",
-"pt-BR": "Anuncie algo aqui",
-"pt-PT": "Anunciar algo aqui",
-"sv": "Meddela något här",
-"th": "ประกาศข้อความที่นี่",
-"zh-CN": "在此处进行公告",
-"zh-TW": "在此公告資訊"
-}
-},
-{
-"type": "url",
-"id": "message_link",
-"label": {
-"da": "Link",
-"de": "Link",
-"en": "Link",
-"es": "Enlace",
-"fi": "Linkki",
-"fr": "Lien",
-"hi": "लिंक",
-"it": "Link",
-"ja": "リンク",
-"ko": "링크",
-"nb": "Kobling",
-"nl": "Link",
-"pt-BR": "Link",
-"pt-PT": "Ligação",
-"sv": "Länk",
-"th": "ลิงก์",
-"zh-CN": "链接",
-"zh-TW": "連結"
-},
-"info": {
-"da": "Valgfri",
-"de": "Optional",
-"en": "Optional",
-"es": "Opcional",
-"fi": "Valinnainen",
-"fr": "Facultatif",
-"hi": "वैकल्पिक",
-"it": "Facoltativo",
-"ja": "オプション",
-"ko": "선택 사항",
-"nb": "Valgfritt",
-"nl": "Optioneel",
-"pt-BR": "Opcional",
-"pt-PT": "Opcional",
-"sv": "Valfritt",
-"th": "ไม่จำเป็น",
-"zh-CN": "可选",
-"zh-TW": "(選填)"
-}
-},
-{
-"type": "color",
-"id": "color_bg",
-"label": {
-"da": "Bjælke",
-"de": "Zeile",
-"en": "Bar",
-"es": "Barra",
-"fi": "Palkki",
-"fr": "Barre",
-"hi": "बार",
-"it": "Barra",
-"ja": "バー",
-"ko": "바",
-"nb": "Felt",
-"nl": "Balk",
-"pt-BR": "Barra",
-"pt-PT": "Barra",
-"sv": "Fält",
-"th": "แถบ",
-"zh-CN": "栏",
-"zh-TW": "橫條"
-},
-"default": "#3a3a3a"
-},
-{
-"type": "color",
-"id": "color_text",
-"label": {
-"da": "Tekst",
-"de": "Text",
-"en": "Text",
-"es": "Texto",
-"fi": "Teksti",
-"fr": "Texte",
-"hi": "टेक्स्ट",
-"it": "Testo",
-"ja": "テキスト",
-"ko": "텍스트",
-"nb": "Tekst",
-"nl": "Tekst",
-"pt-BR": "Texto",
-"pt-PT": "Texto",
-"sv": "Text",
-"th": "ข้อความ",
-"zh-CN": "文本",
-"zh-TW": "文字"
-},
-"default": "#ffffff"
-}
-]
-}
+
 {% endschema %}

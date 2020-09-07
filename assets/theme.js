@@ -16,7 +16,7 @@ theme.Sections = function Sections() {
     .on('shopify:block:deselect', this._onBlockDeselect.bind(this));
 };
 
-theme.Sections.prototype = _.assignIn({}, theme.Sections.prototype, {
+theme.Sections.prototype = Object.assign({}, theme.Sections.prototype, {
   _createInstance: function (container, constructor) {
     var $container = $(container);
     var id = $container.attr('data-section-id');
@@ -24,11 +24,11 @@ theme.Sections.prototype = _.assignIn({}, theme.Sections.prototype, {
 
     constructor = constructor || this.constructors[type];
 
-    if (_.isUndefined(constructor)) {
+    if (typeof constructor === 'undefined') {
       return;
     }
 
-    var instance = _.assignIn(new constructor(container), {
+    var instance = Object.assign(new constructor(container), {
       id: id,
       type: type,
       container: container
@@ -45,11 +45,11 @@ theme.Sections.prototype = _.assignIn({}, theme.Sections.prototype, {
   },
 
   _onSectionUnload: function (evt) {
-    this.instances = _.filter(this.instances, function (instance) {
+    this.instances = this.instances.filter(function (instance) {
       var isEventInstance = instance.id === evt.detail.sectionId;
 
       if (isEventInstance) {
-        if (_.isFunction(instance.onUnload)) {
+        if (typeof instance.onUnload === 'function') {
           instance.onUnload(evt);
         }
       }
@@ -60,44 +60,56 @@ theme.Sections.prototype = _.assignIn({}, theme.Sections.prototype, {
 
   _onSelect: function (evt) {
     // eslint-disable-next-line no-shadow
-    var instance = _.find(this.instances, function (instance) {
+    var instance = this.instances.find(function (instance) {
       return instance.id === evt.detail.sectionId;
     });
 
-    if (!_.isUndefined(instance) && _.isFunction(instance.onSelect)) {
+    if (
+      typeof instance !== 'undefined' &&
+      typeof instance.onSelect === 'function'
+    ) {
       instance.onSelect(evt);
     }
   },
 
   _onDeselect: function (evt) {
     // eslint-disable-next-line no-shadow
-    var instance = _.find(this.instances, function (instance) {
+    var instance = this.instances.find(function (instance) {
       return instance.id === evt.detail.sectionId;
     });
 
-    if (!_.isUndefined(instance) && _.isFunction(instance.onDeselect)) {
+    if (
+      typeof instance !== 'undefined' &&
+      typeof instance.onDeselect === 'function'
+    ) {
       instance.onDeselect(evt);
     }
   },
 
   _onBlockSelect: function (evt) {
     // eslint-disable-next-line no-shadow
-    var instance = _.find(this.instances, function (instance) {
+    var instance = this.instances.find(function (instance) {
       return instance.id === evt.detail.sectionId;
     });
 
-    if (!_.isUndefined(instance) && _.isFunction(instance.onBlockSelect)) {
+    if (
+      typeof instance !== 'undefined' &&
+      typeof instance.onBlockSelect === 'function'
+    ) {
       instance.onBlockSelect(evt);
     }
   },
 
   _onBlockDeselect: function (evt) {
     // eslint-disable-next-line no-shadow
-    var instance = _.find(this.instances, function (instance) {
+    var instance = this.instances.find(function (instance) {
       return instance.id === evt.detail.sectionId;
     });
 
-    if (!_.isUndefined(instance) && _.isFunction(instance.onBlockDeselect)) {
+    if (
+      typeof instance !== 'undefined' &&
+      typeof instance.onBlockDeselect === 'function'
+    ) {
       instance.onBlockDeselect(evt);
     }
   },
@@ -286,6 +298,8 @@ slate.a11y = {
    * @param {string} options.namespace - Namespace used for new focus event handler
    */
   trapFocus: function (options) {
+    if (options.container) options.$container = $(options.container);
+
     var eventsName = {
       focusin: options.namespace ? 'focusin.' + options.namespace : 'focusin',
       focusout: options.namespace
@@ -306,6 +320,10 @@ slate.a11y = {
     );
     var firstFocusable = $focusableElements[0];
     var lastFocusable = $focusableElements[$focusableElements.length - 1];
+
+    if (options.elementToFocus) {
+      options.$elementToFocus = $(options.elementToFocus);
+    }
 
     if (!options.$elementToFocus) {
       options.$elementToFocus = options.$container;
@@ -358,6 +376,8 @@ slate.a11y = {
    * @param {string} options.namespace - Namespace used for new focus event handler
    */
   removeTrapFocus: function (options) {
+    if (options.container) options.$container = $(options.container);
+
     var eventName = options.namespace
       ? 'focusin.' + options.namespace
       : 'focusin';
@@ -674,7 +694,7 @@ slate.Variants = (function () {
     );
   }
 
-  Variants.prototype = _.assignIn({}, Variants.prototype, {
+  Variants.prototype = Object.assign({}, Variants.prototype, {
     /**
      * Get the currently selected options from add-to-cart form. Works with all
      * form input elements.
@@ -682,9 +702,8 @@ slate.Variants = (function () {
      * @return {array} options - Values of currently selected variants
      */
     _getCurrentOptions: function () {
-      var currentOptions = _.map(
-        $(this.singleOptionSelector, this.$container),
-        function (element) {
+      return $(this.singleOptionSelector, this.$container)
+        .map(function (index, element) {
           var $element = $(element);
           var type = $element.attr('type');
           var currentOption = {};
@@ -704,13 +723,8 @@ slate.Variants = (function () {
 
             return currentOption;
           }
-        }
-      );
-
-      // remove any unchecked input values if using radio buttons or checkboxes
-      currentOptions = _.compact(currentOptions);
-
-      return currentOptions;
+        })
+        .get();
     },
 
     /**
@@ -723,9 +737,9 @@ slate.Variants = (function () {
       var selectedValues = this._getCurrentOptions();
       var variants = this.product.variants;
 
-      var found = _.find(variants, function (variant) {
+      var found = variants.find(function (variant) {
         return selectedValues.every(function (values) {
-          return _.isEqual(variant[values.index], values.value);
+          return variant[values.index] === values.value;
         });
       });
 
@@ -2235,6 +2249,12 @@ theme.Drawers = (function () {
 theme.Helpers = (function () {
   var touchDevice = false;
 
+  var classes = {
+    preventScrolling: 'prevent-scrolling'
+  };
+
+  var scrollPosition = window.pageYOffset;
+
   function setTouch() {
     touchDevice = true;
   }
@@ -2242,9 +2262,42 @@ theme.Helpers = (function () {
   function isTouch() {
     return touchDevice;
   }
+
+  function enableScrollLock() {
+    scrollPosition = window.pageYOffset;
+    document.body.style.top = '-' + scrollPosition + 'px';
+    document.body.classList.add(classes.preventScrolling);
+  }
+
+  function disableScrollLock() {
+    document.body.classList.remove(classes.preventScrolling);
+    document.body.style.removeProperty('top');
+    window.scrollTo(0, scrollPosition);
+  }
+
+  function debounce(func, wait, immediate) {
+    var timeout;
+    return function () {
+      var context = this,
+        args = arguments;
+
+      var later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+
   return {
     setTouch: setTouch,
-    isTouch: isTouch
+    isTouch: isTouch,
+    enableScrollLock: enableScrollLock,
+    disableScrollLock: disableScrollLock,
+    debounce: debounce
   };
 })();
 
@@ -2368,141 +2421,172 @@ theme.Header = (function () {
 
   function init() {
     cacheSelectors();
-    styleDropdowns($(selectors.siteNavHasDropdown));
+    styleDropdowns(document.querySelectorAll(selectors.siteNavHasDropdown));
     positionFullWidthDropdowns();
 
-    cache.$parents.on('click.siteNav', function () {
-      var $el = $(this);
-      $el.hasClass(config.activeClass) ? hideDropdown($el) : showDropdown($el);
+    cache.parents.forEach(function (element) {
+      element.addEventListener('click', submenuParentClickHandler);
     });
 
     // check when we're leaving a dropdown and close the active dropdown
-    $(selectors.siteNavChildLink).on('focusout.siteNav', function () {
-      setTimeout(function () {
-        if (
-          $(document.activeElement).hasClass(config.childLinkClass) ||
-          !cache.$activeDropdown.length
-        ) {
-          return;
-        }
-
-        hideDropdown(cache.$activeDropdown);
-      });
+    cache.siteNavChildLink.forEach(function (element) {
+      element.addEventListener('focusout', submenuFocusoutHandler);
     });
 
-    // close dropdowns when on top level nav
-    cache.$topLevel.on('focus.siteNav', function () {
-      if (cache.$activeDropdown.length) {
-        hideDropdown(cache.$activeDropdown);
-      }
+    cache.topLevel.forEach(function (element) {
+      element.addEventListener('focus', hideDropdown);
     });
 
-    cache.$subMenuLinks.on('click.siteNav', function (evt) {
-      // Prevent click on body from firing instead of link
-      evt.stopImmediatePropagation();
+    cache.subMenuLinks.forEach(function (element) {
+      element.addEventListener('click', stopImmediatePropagation);
     });
 
-    $(window).resize(
-      $.debounce(50, function () {
-        styleDropdowns($(selectors.siteNavHasDropdown));
-        positionFullWidthDropdowns();
-      })
-    );
+    window.addEventListener('resize', resizeHandler);
+  }
+
+  function stopImmediatePropagation(event) {
+    event.stopImmediatePropagation();
   }
 
   function cacheSelectors() {
+    var navigation = document.querySelector(selectors.navigation);
+
     cache = {
-      $nav: $(selectors.navigation),
-      $topLevel: $(selectors.siteNavLinkMain),
-      $parents: $(selectors.navigation).find(selectors.siteNavHasDropdown),
-      $subMenuLinks: $(selectors.siteNavChildLinks),
-      $activeDropdown: $(selectors.siteNavActiveDropdown),
-      $siteHeader: $(selectors.siteHeader)
+      nav: navigation,
+      topLevel: document.querySelectorAll(selectors.siteNavLinkMain),
+      parents: navigation.querySelectorAll(selectors.siteNavHasDropdown),
+      subMenuLinks: document.querySelectorAll(selectors.siteNavChildLinks),
+      activeDropdown: document.querySelector(selectors.siteNavActiveDropdown),
+      siteHeader: document.querySelector(selectors.siteHeader),
+      siteNavChildLink: document.querySelectorAll(selectors.siteNavChildLink)
     };
   }
 
-  function showDropdown($el) {
-    $el.addClass(config.activeClass);
+  function showDropdown(element) {
+    element.classList.add(config.activeClass);
 
-    // close open dropdowns
-    if (cache.$activeDropdown.length) {
-      hideDropdown(cache.$activeDropdown);
-    }
+    if (cache.activeDropdown) hideDropdown();
 
-    cache.$activeDropdown = $el;
+    cache.activeDropdown = element;
 
-    // set expanded on open dropdown
-    $el.find(selectors.siteNavLinkMain).attr('aria-expanded', 'true');
+    element
+      .querySelector(selectors.siteNavLinkMain)
+      .setAttribute('aria-expanded', 'true');
 
     setTimeout(function () {
-      $(window).on('keyup.siteNav', function (evt) {
-        if (evt.keyCode === 27) {
-          hideDropdown($el);
-        }
-      });
-
-      $(selectors.body).on('click.siteNav', function () {
-        hideDropdown($el);
-      });
+      window.addEventListener('keyup', keyUpHandler);
+      document.body.addEventListener('click', hideDropdown);
     }, 250);
   }
 
-  function hideDropdown($el) {
-    // remove aria on open dropdown
-    $el.find(selectors.siteNavLinkMain).attr('aria-expanded', 'false');
-    $el.removeClass(config.activeClass);
+  function hideDropdown() {
+    if (!cache.activeDropdown) return;
 
-    // reset active dropdown
-    cache.$activeDropdown = $(selectors.siteNavActiveDropdown);
+    cache.activeDropdown
+      .querySelector(selectors.siteNavLinkMain)
+      .setAttribute('aria-expanded', 'false');
+    cache.activeDropdown.classList.remove(config.activeClass);
 
-    $(selectors.body).off('click.siteNav');
-    $(window).off('keyup.siteNav');
+    cache.activeDropdown = document.querySelector(
+      selectors.siteNavActiveDropdown
+    );
+
+    window.removeEventListener('keyup', keyUpHandler);
+    document.body.removeEventListener('click', hideDropdown);
   }
 
-  function styleDropdowns($dropdownListItems) {
-    $dropdownListItems.each(function () {
-      var $dropdownLi = $(this).find(selectors.siteNavDropdown);
-      if (!$dropdownLi.length) {
-        return;
-      }
-      var isRightOfLogo =
-        Math.ceil($(this).offset().left) >
-          Math.floor(cache.$siteHeader.outerWidth()) / 2
-          ? true
-          : false;
-      if (isRightOfLogo) {
-        $dropdownLi
-          .removeClass(config.leftDropdownClass)
-          .addClass(config.rightDropdownClass);
+  function styleDropdowns(dropdownListItems) {
+    dropdownListItems.forEach(function (item) {
+      var dropdownLi = item.querySelector(selectors.siteNavDropdown);
+
+      if (!dropdownLi) return;
+
+      if (isRightOfLogo(item)) {
+        dropdownLi.classList.remove(config.leftDropdownClass);
+        dropdownLi.classList.add(config.rightDropdownClass);
       } else {
-        $dropdownLi
-          .removeClass(config.rightDropdownClass)
-          .addClass(config.leftDropdownClass);
+        dropdownLi.classList.remove(config.rightDropdownClass);
+        dropdownLi.classList.add(config.leftDropdownClass);
       }
     });
+  }
+
+  function isRightOfLogo(item) {
+    var rect = item.getBoundingClientRect();
+    var win = item.ownerDocument.defaultView;
+    var leftOffset = rect.left + win.pageXOffset;
+
+    var headerWidth = Math.floor(cache.siteHeader.offsetWidth) / 2;
+    return leftOffset > headerWidth;
   }
 
   function positionFullWidthDropdowns() {
-    var $listWithCenteredDropdown = $(selectors.siteNavHasCenteredDropdown);
+    document
+      .querySelectorAll(selectors.siteNavHasCenteredDropdown)
+      .forEach(function (el) {
+        var fullWidthDropdown = el.querySelector(
+          selectors.siteNavCenteredDropdown
+        );
 
-    $listWithCenteredDropdown.each(function () {
-      var $hasCenteredDropdown = $(this);
-      var $fullWidthDropdown = $hasCenteredDropdown.find(
-        selectors.siteNavCenteredDropdown
-      );
+        var fullWidthDropdownOffset = el.offsetTop + 41;
+        fullWidthDropdown.style.top = fullWidthDropdownOffset + 'px';
+      });
+  }
 
-      var fullWidthDropdownOffset = $hasCenteredDropdown.position().top + 41;
-      $fullWidthDropdown.css('top', fullWidthDropdownOffset);
+  function keyUpHandler(event) {
+    if (event.keyCode === 27) hideDropdown();
+  }
+
+  function resizeHandler() {
+    adjustStyleAndPosition();
+  }
+
+  function submenuParentClickHandler(event) {
+    var element = event.currentTarget;
+
+    element.classList.contains(config.activeClass)
+      ? hideDropdown()
+      : showDropdown(element);
+  }
+
+  function submenuFocusoutHandler() {
+    setTimeout(function () {
+      if (
+        document.activeElement.classList.contains(config.childLinkClass) ||
+        !cache.activeDropdown
+      ) {
+        return;
+      }
+
+      hideDropdown();
     });
   }
 
+  var adjustStyleAndPosition = theme.Helpers.debounce(function () {
+    styleDropdowns(document.querySelectorAll(selectors.siteNavHasDropdown));
+    positionFullWidthDropdowns();
+  }, 50);
+
   function unload() {
-    $(window).off('.siteNav');
-    cache.$parents.off('.siteNav');
-    cache.$subMenuLinks.off('.siteNav');
-    cache.$topLevel.off('.siteNav');
-    $(selectors.siteNavChildLink).off('.siteNav');
-    $(selectors.body).off('.siteNav');
+    cache.topLevel.forEach(function (element) {
+      element.removeEventListener('focus', hideDropdown);
+    });
+
+    cache.subMenuLinks.forEach(function (element) {
+      element.removeEventListener('click', stopImmediatePropagation);
+    });
+
+    cache.parents.forEach(function (element) {
+      element.removeEventListener('click', submenuParentClickHandler);
+    });
+
+    cache.siteNavChildLink.forEach(function (element) {
+      element.removeEventListener('focusout', submenuFocusoutHandler);
+    });
+
+    window.removeEventListener('resize', resizeHandler);
+    window.removeEventListener('keyup', keyUpHandler);
+    document.body.removeEventListener('click', hideDropdown);
   }
 
   return {
@@ -2533,8 +2617,14 @@ theme.MobileNav = (function () {
   var $activeSubNav;
   var $activeTrigger;
   var menuLevel = 1;
-  // Breakpoints from src/stylesheets/global/variables.scss.liquid
-  var mediaQuerySmall = 'screen and (max-width: 749px)';
+  var mediumUpQuery = '(min-width: ' + theme.breakpoints.medium + 'px)';
+  var mql = window.matchMedia(mediumUpQuery);
+
+  $(document).on('shopify:section:unload', function (event) {
+    if (event.detail.sectionId !== 'header') return;
+
+    mql.removeListener(initBreakpoints);
+  });
 
   function init() {
     cacheSelectors();
@@ -2542,14 +2632,13 @@ theme.MobileNav = (function () {
     cache.$mobileNavToggle.on('click', toggleMobileNav);
     cache.$subNavToggleBtn.on('click.subNav', toggleSubNav);
 
-    // Close mobile nav when unmatching mobile breakpoint
-    enquire.register(mediaQuerySmall, {
-      unmatch: function () {
-        if (cache.$mobileNavContainer.hasClass(classes.navOpen)) {
-          closeMobileNav();
-        }
-      }
-    });
+    mql.addListener(initBreakpoints);
+  }
+
+  function initBreakpoints() {
+    if (mql.matches && cache.$mobileNavContainer.hasClass(classes.navOpen)) {
+      closeMobileNav();
+    }
   }
 
   function toggleMobileNav() {
@@ -3232,10 +3321,6 @@ theme.Video = (function () {
   }
 
   function playOnClickCheck() {
-    // Bail early for a few instances:
-    // - small screen
-    // - device sniff mobile browser
-
     if (playOnClickChecked) {
       return;
     }
@@ -3570,7 +3655,7 @@ theme.Video = (function () {
   }
 
   function isMobile() {
-    return $(window).width() < 750 || window.mobileCheck();
+    return $(window).width() < theme.breakpoints.medium;
   }
 
   function initEvents() {
@@ -4754,23 +4839,11 @@ theme.SearchDrawer = (function () {
   }
 
   function lockBodyScroll() {
-    // Disable scroll except on the predictive search container.
-    window.bodyScrollLock.disableBodyScroll(
-      document.querySelector(selectors.predictiveSearchWrapper),
-      {
-        allowTouchMove: function (element) {
-          return (
-            // If the touch event is in an element under the predictive search
-            // we allow don't prevent default.
-            $(element).parents(selectors.predictiveSearchWrapper).length === 1
-          );
-        }
-      }
-    );
+    theme.Helpers.enableScrollLock();
   }
 
   function unlockBodyScroll() {
-    window.bodyScrollLock.clearAllBodyScrollLocks();
+    theme.Helpers.disableScrollLock();
   }
 
   return {
@@ -4800,7 +4873,7 @@ theme.Disclosure = (function () {
     this._onFocusOut();
   }
 
-  Disclosure.prototype = _.assignIn({}, Disclosure.prototype, {
+  Disclosure.prototype = Object.assign({}, Disclosure.prototype, {
     _cacheSelectors: function () {
       this.cache = {
         $disclosureList: this.$container.find(selectors.disclosureList),
@@ -4903,6 +4976,177 @@ theme.Disclosure = (function () {
   });
 
   return Disclosure;
+})();
+
+theme.Zoom = (function () {
+  var selectors = {
+    imageZoom: '[data-image-zoom]'
+  };
+
+  var classes = {
+    zoomImg: 'zoomImg'
+  };
+
+  var attributes = {
+    imageZoomTarget: 'data-image-zoom-target'
+  };
+
+  function Zoom(container) {
+    this.container = container;
+    this.cache = {};
+    this.url = container.dataset.zoom;
+
+    this._cacheSelectors();
+
+    if (!this.cache.sourceImage) return;
+
+    this._duplicateImage();
+  }
+
+  Zoom.prototype = Object.assign({}, Zoom.prototype, {
+    _cacheSelectors: function () {
+      this.cache = {
+        sourceImage: this.container.querySelector(selectors.imageZoom)
+      };
+    },
+
+    _init: function () {
+      var targetWidth = this.cache.targetImage.width;
+      var targetHeight = this.cache.targetImage.height;
+
+      if (this.cache.sourceImage === this.cache.targetImage) {
+        this.sourceWidth = targetWidth;
+        this.sourceHeight = targetHeight;
+      } else {
+        this.sourceWidth = this.cache.sourceImage.width;
+        this.sourceHeight = this.cache.sourceImage.height;
+      }
+
+      this.xRatio =
+        (this.cache.sourceImage.width - targetWidth) / this.sourceWidth;
+      this.yRatio =
+        (this.cache.sourceImage.height - targetHeight) / this.sourceHeight;
+    },
+
+    _start: function (e) {
+      this._init();
+      this._move(e);
+    },
+
+    _stop: function () {
+      this.cache.targetImage.style.opacity = 0;
+    },
+
+    /**
+     * Sets the correct coordinates top and left position in px
+     * It sets a limit within between 0 and the max height of the image
+     * So when the mouse leaves the target image, it could
+     * never go above or beyond the target image zone
+     */
+    _setTopLeftMaxValues: function (top, left) {
+      return {
+        left: Math.max(Math.min(left, this.sourceWidth), 0),
+        top: Math.max(Math.min(top, this.sourceHeight), 0)
+      };
+    },
+
+    _move: function (e) {
+      // get left and top position within the "source image" zone
+      var left =
+        e.pageX -
+        (this.cache.sourceImage.getBoundingClientRect().left + window.scrollX);
+      var top =
+        e.pageY -
+        (this.cache.sourceImage.getBoundingClientRect().top + window.scrollY);
+      // make sure the left and top position don't go
+      // above or beyond the target image zone
+      var position = this._setTopLeftMaxValues(top, left);
+
+      top = position.top;
+      left = position.left;
+
+      this.cache.targetImage.style.left = -(left * -this.xRatio) + 'px';
+      this.cache.targetImage.style.top = -(top * -this.yRatio) + 'px';
+      this.cache.targetImage.style.opacity = 1;
+    },
+
+    /**
+     * This loads a high resolution image
+     * via the data attributes url
+     * It adds all necessary CSS styles and adds to the container
+     */
+    _duplicateImage: function () {
+      this._loadImage()
+        .then(
+          function (image) {
+            this.cache.targetImage = image;
+            image.style.width = image.width + 'px';
+            image.style.height = image.height + 'px';
+            image.style.position = 'absolute';
+            image.style.maxWidth = 'none';
+            image.style.maxHeight = 'none';
+            image.style.opacity = 0;
+            image.style.border = 'none';
+            image.style.left = 0;
+            image.style.top = 0;
+
+            this.container.appendChild(image);
+
+            this._init();
+
+            this._start = this._start.bind(this);
+            this._stop = this._stop.bind(this);
+            this._move = this._move.bind(this);
+
+            this.container.addEventListener('mouseenter', this._start);
+            this.container.addEventListener('mouseleave', this._stop);
+            this.container.addEventListener('mousemove', this._move);
+
+            this.container.style.position = 'relative';
+            this.container.style.overflow = 'hidden';
+          }.bind(this)
+        )
+        .catch(function (error) {
+          // eslint-disable-next-line no-console
+          console.warn('Error fetching image', error);
+        });
+    },
+
+    _loadImage: function () {
+      // eslint-disable-next-line
+      return new Promise(function (resolve, reject) {
+        var image = new Image();
+        image.setAttribute('role', 'presentation');
+        image.setAttribute(attributes.imageZoomTarget, true);
+        image.classList.add(classes.zoomImg);
+        image.src = this.url;
+
+        image.addEventListener('load', function () {
+          resolve(image);
+        });
+
+        image.addEventListener('error', function (error) {
+          reject(error);
+        });
+      }.bind(this)
+      );
+    },
+
+    unload: function () {
+      var targetImage = this.container.querySelector(
+        '[' + attributes.imageZoomTarget + ']'
+      );
+      if (targetImage) {
+        targetImage.remove();
+      }
+
+      this.container.removeEventListener('mouseenter', this._start);
+      this.container.removeEventListener('mouseleave', this._stop);
+      this.container.removeEventListener('mousemove', this._move);
+    }
+  });
+
+  return Zoom;
 })();
 
 
@@ -5235,7 +5479,7 @@ theme.Cart = (function () {
     }
   }
 
-  Cart.prototype = _.assignIn({}, Cart.prototype, {
+  Cart.prototype = Object.assign({}, Cart.prototype, {
     _setupCartTemplates: function () {
       this.$itemTemplate = $(selectors.cartItem, this.$container)
         .first()
@@ -5946,8 +6190,7 @@ window.theme = window.theme || {};
 
 theme.Filters = (function () {
   var settings = {
-    // Breakpoints from src/stylesheets/global/variables.scss.liquid
-    mediaQueryMediumUp: 'screen and (min-width: 750px)'
+    mediaQueryMediumUp: '(min-width: ' + theme.breakpoints.medium + 'px)'
   };
 
   var selectors = {
@@ -5972,21 +6215,22 @@ theme.Filters = (function () {
     this.defaultSort = this._getDefaultSortValue();
     this.$selects.removeClass('hidden');
 
+    this.initBreakpoints = this._initBreakpoints.bind(this);
+
+    this.mql = window.matchMedia(settings.mediaQueryMediumUp);
+    this.mql.addListener(this.initBreakpoints);
+
     this.$filterSelect.on('change', this._onFilterChange.bind(this));
     this.$sortSelect.on('change', this._onSortChange.bind(this));
     this._initBreakpoints();
     this._initParams();
   }
 
-  Filters.prototype = _.assignIn({}, Filters.prototype, {
+  Filters.prototype = Object.assign({}, Filters.prototype, {
     _initBreakpoints: function () {
-      var self = this;
-
-      enquire.register(settings.mediaQueryMediumUp, {
-        match: function () {
-          slate.utils.resizeSelects(self.$selects);
-        }
-      });
+      if (this.mql.matches) {
+        slate.utils.resizeSelects(this.$selects);
+      }
     },
 
     _initParams: function () {
@@ -6033,6 +6277,8 @@ theme.Filters = (function () {
     onUnload: function () {
       this.$filterSelect.off('change', this._onFilterChange);
       this.$sortSelect.off('change', this._onSortChange);
+
+      this.mql.removeListener(this.initBreakpoints);
     }
   });
 
@@ -6049,7 +6295,7 @@ theme.HeaderSection = (function () {
     theme.Search.init();
   }
 
-  Header.prototype = _.assignIn({}, Header.prototype, {
+  Header.prototype = Object.assign({}, Header.prototype, {
     onUnload: function () {
       theme.Header.unload();
       theme.Search.unload();
@@ -6154,7 +6400,7 @@ theme.Maps = (function () {
     return deferred;
   }
 
-  Map.prototype = _.assignIn({}, Map.prototype, {
+  Map.prototype = Object.assign({}, Map.prototype, {
     createMap: function () {
       var $map = this.$map;
 
@@ -6241,6 +6487,7 @@ theme.Product = (function () {
   function Product(container) {
     var $container = (this.$container = $(container));
     var sectionId = $container.attr('data-section-id');
+    this.zoomPictures = [];
     this.ajaxEnabled = $container.data('ajax-enabled');
 
     this.settings = {
@@ -6334,6 +6581,8 @@ theme.Product = (function () {
     this.$loader = $(this.selectors.loader, this.$addToCart);
     this.$loaderStatus = $(this.selectors.loaderStatus, $container);
 
+    this.$imageZoomWrapper = $(this.selectors.imageZoomWrapper, $container);
+
     // Stop parsing if we don't have the product json script tag when loading
     // section in the Theme Editor
     if (!$('#ProductJson-' + sectionId).html()) {
@@ -6344,11 +6593,21 @@ theme.Product = (function () {
       document.getElementById('ProductJson-' + sectionId).innerHTML
     );
 
-    this.settings.zoomEnabled = $(this.selectors.imageZoomWrapper).hasClass(
+    this.settings.zoomEnabled = this.$imageZoomWrapper.hasClass(
       this.classes.jsZoomEnabled
     );
 
-    this._initBreakpoints();
+    this.initMobileBreakpoint = this._initMobileBreakpoint.bind(this);
+    this.initDesktopBreakpoint = this._initDesktopBreakpoint.bind(this);
+
+    this.mqlSmall = window.matchMedia(this.settings.mediaQuerySmall);
+    this.mqlSmall.addListener(this.initMobileBreakpoint);
+
+    this.mqlMediumUp = window.matchMedia(this.settings.mediaQueryMediumUp);
+    this.mqlMediumUp.addListener(this.initDesktopBreakpoint);
+
+    this.initMobileBreakpoint();
+    this.initDesktopBreakpoint();
     this._stringOverrides();
     this._initVariants();
     this._initMediaSwitch();
@@ -6359,49 +6618,46 @@ theme.Product = (function () {
     this._initShopifyXrLaunch();
   }
 
-  Product.prototype = _.assignIn({}, Product.prototype, {
+  Product.prototype = Object.assign({}, Product.prototype, {
     _stringOverrides: function () {
       theme.productStrings = theme.productStrings || {};
       $.extend(theme.strings, theme.productStrings);
     },
 
-    _initBreakpoints: function () {
-      var self = this;
-
-      enquire.register(this.settings.mediaQuerySmall, {
-        match: function () {
-          // initialize thumbnail slider on mobile if more than four thumbnails
-          if ($(self.selectors.productThumbImages).length > 4) {
-            self._initThumbnailSlider();
-          }
-
-          // destroy image zooming if enabled
-          if (self.settings.zoomEnabled) {
-            $(self.selectors.imageZoomWrapper).each(function () {
-              _destroyZoom(this);
-            });
-          }
-
-          self.settings.bpSmall = true;
-        },
-        unmatch: function () {
-          if (self.settings.sliderActive) {
-            self._destroyThumbnailSlider();
-          }
-
-          self.settings.bpSmall = false;
+    _initMobileBreakpoint: function () {
+      if (this.mqlSmall.matches) {
+        // initialize thumbnail slider on mobile if more than four thumbnails
+        if ($(this.selectors.productThumbImages).length > 4) {
+          this._initThumbnailSlider();
         }
-      });
 
-      enquire.register(this.settings.mediaQueryMediumUp, {
-        match: function () {
-          if (self.settings.zoomEnabled) {
-            $(self.selectors.imageZoomWrapper).each(function () {
-              _enableZoom(this);
-            });
-          }
+        // destroy image zooming if enabled
+        if (this.settings.zoomEnabled) {
+          this.$imageZoomWrapper.each(
+            function (index) {
+              this._destroyZoom(index);
+            }.bind(this)
+          );
         }
-      });
+
+        this.settings.bpSmall = true;
+      } else {
+        if (this.settings.sliderActive) {
+          this._destroyThumbnailSlider();
+        }
+
+        this.settings.bpSmall = false;
+      }
+    },
+
+    _initDesktopBreakpoint: function () {
+      if (this.mqlMediumUp.matches && this.settings.zoomEnabled) {
+        this.$imageZoomWrapper.each(
+          function (index, element) {
+            this._enableZoom(element, index);
+          }.bind(this)
+        );
+      }
     },
 
     _initVariants: function () {
@@ -7022,9 +7278,9 @@ theme.Product = (function () {
           this.$addToCart
             .removeAttr('aria-disabled')
             .attr('aria-label', theme.strings.addToCart);
-          $(this.selectors.addToCartText, this.$container).text(
-            theme.strings.addToCart
-          );
+          $(this.selectors.addToCartText, this.$container)
+            .html(theme.strings.addToCart)
+            .text();
           $(this.selectors.productForm, this.container).removeClass(
             this.classes.variantSoldOut
           );
@@ -7033,9 +7289,9 @@ theme.Product = (function () {
           this.$addToCart
             .attr('aria-disabled', true)
             .attr('aria-label', theme.strings.soldOut);
-          $(this.selectors.addToCartText, this.$container).text(
-            theme.strings.soldOut
-          );
+          $(this.selectors.addToCartText, this.$container)
+            .html(theme.strings.soldOut)
+            .text();
           $(this.selectors.productForm, this.container).addClass(
             this.classes.variantSoldOut
           );
@@ -7045,9 +7301,9 @@ theme.Product = (function () {
         this.$addToCart
           .attr('aria-disabled', true)
           .attr('aria-label', theme.strings.unavailable);
-        $(this.selectors.addToCartText, this.$container).text(
-          theme.strings.unavailable
-        );
+        $(this.selectors.addToCartText, this.$container)
+          .html(theme.strings.unavailable)
+          .text();
         $(this.selectors.productForm, this.container).addClass(
           this.classes.variantSoldOut
         );
@@ -7155,23 +7411,24 @@ theme.Product = (function () {
       $(this.selectors.SKU).html(variant.sku);
     },
 
+    _enableZoom: function (el, index) {
+      this.zoomPictures[index] = new theme.Zoom(el);
+    },
+
+    _destroyZoom: function (index) {
+      if (this.zoomPictures.length === 0) return;
+      this.zoomPictures[index].unload();
+    },
+
     onUnload: function () {
       this.$container.off(this.settings.namespace);
       theme.ProductVideo.removeSectionVideos(this.settings.sectionId);
       theme.ProductModel.removeSectionModels(this.settings.sectionId);
+
+      this.mqlSmall.removeListener(this.initMobileBreakpoint);
+      this.mqlMediumUp.removeListener(this.initDesktopBreakpoint);
     }
   });
-
-  function _enableZoom(el) {
-    var zoomUrl = $(el).data('zoom');
-    $(el).zoom({
-      url: zoomUrl
-    });
-  }
-
-  function _destroyZoom(el) {
-    $(el).trigger('zoom.destroy');
-  }
 
   return Product;
 })();
@@ -7222,16 +7479,16 @@ theme.Quotes = (function () {
     var sectionId = $container.attr('data-section-id');
     var wrapper = (this.wrapper = '.quotes-wrapper');
     var slider = (this.slider = '#Quotes-' + sectionId);
-    var $slider = $(slider, wrapper);
+    this.$slider = $(slider, wrapper);
 
-    var sliderActive = false;
-    var mobileOptions = $.extend({}, defaults, {
+    this.sliderActive = false;
+    this.mobileOptions = $.extend({}, defaults, {
       slidesToShow: 1,
       slidesToScroll: 1,
       adaptiveHeight: true
     });
 
-    config.slideCount = $slider.data('count');
+    config.slideCount = this.$slider.data('count');
 
     // Override slidesToShow/Scroll if there are not enough blocks
     if (config.slideCount < defaults.slidesToShow) {
@@ -7239,35 +7496,25 @@ theme.Quotes = (function () {
       defaults.slidesToScroll = config.slideCount;
     }
 
-    $slider.on('init', this.a11y.bind(this));
+    this.$slider.on('init', this.a11y.bind(this));
 
-    enquire.register(config.mediaQuerySmall, {
-      match: function () {
-        initSlider($slider, mobileOptions);
-      }
-    });
+    this.initMobileSlider = this._initMobileSlider.bind(this);
+    this.initDesktopSlider = this._initDesktopSlider.bind(this);
 
-    enquire.register(config.mediaQueryMediumUp, {
-      match: function () {
-        initSlider($slider, defaults);
-      }
-    });
+    this.mqlSmall = window.matchMedia(config.mediaQuerySmall);
+    this.mqlSmall.addListener(this.initMobileSlider);
 
-    function initSlider(sliderObj, args) {
-      if (sliderActive) {
-        sliderObj.slick('unslick');
-        sliderActive = false;
-      }
+    this.mqlMediumUp = window.matchMedia(config.mediaQueryMediumUp);
+    this.mqlMediumUp.addListener(this.initDesktopSlider);
 
-      sliderObj.slick(args);
-      sliderActive = true;
-    }
+    this.initMobileSlider();
+    this.initDesktopSlider();
   }
 
-  Quotes.prototype = _.assignIn({}, Quotes.prototype, {
+  Quotes.prototype = Object.assign({}, Quotes.prototype, {
     onUnload: function () {
-      enquire.unregister(config.mediaQuerySmall);
-      enquire.unregister(config.mediaQueryMediumUp);
+      this.mqlSmall.removeListener(this.initMobileSlider);
+      this.mqlMediumUp.removeListener(this.initDesktopSlider);
 
       $(this.slider, this.wrapper).slick('unslick');
     },
@@ -7303,6 +7550,28 @@ theme.Quotes = (function () {
           $list.removeAttr('aria-live');
         }
       });
+    },
+
+    _initMobileSlider: function () {
+      if (this.mqlSmall.matches) {
+        this._initSlider(this.mobileOptions);
+      }
+    },
+
+    _initDesktopSlider: function () {
+      if (this.mqlMediumUp.matches) {
+        this._initSlider(defaults);
+      }
+    },
+
+    _initSlider: function (args) {
+      if (this.sliderActive) {
+        this.$slider.slick('unslick');
+        this.sliderActive = false;
+      }
+
+      this.$slider.slick(args);
+      this.sliderActive = true;
     }
   });
 
@@ -7323,7 +7592,7 @@ theme.SlideshowSection = (function () {
   return SlideshowSection;
 })();
 
-theme.SlideshowSection.prototype = _.assignIn(
+theme.SlideshowSection.prototype = Object.assign(
   {},
   theme.SlideshowSection.prototype,
   {
@@ -7372,7 +7641,7 @@ theme.VideoSection = (function () {
   return VideoSection;
 })();
 
-theme.VideoSection.prototype = _.assignIn({}, theme.VideoSection.prototype, {
+theme.VideoSection.prototype = Object.assign({}, theme.VideoSection.prototype, {
   onUnload: function () {
     theme.Video.removeEvents();
   }
@@ -7417,7 +7686,7 @@ theme.FooterSection = (function () {
     }
   }
 
-  Footer.prototype = _.assignIn({}, Footer.prototype, {
+  Footer.prototype = Object.assign({}, Footer.prototype, {
     cacheSelectors: function () {
       this.cache = {
         $localeDisclosure: this.$container.find(selectors.disclosureLocale),
@@ -7439,8 +7708,9 @@ theme.FooterSection = (function () {
   return Footer;
 })();
 
-// custom js
+
 $(document).ready(function () {
+
 
   $('.shop-slides').owlCarousel({ items: 4, nav: true, margin: 30, dots: false, autoplay: false, autoplayHoverPause: true, loop: true, navText: ["<i class='fas fa-long-arrow-alt-left'></i>", "<i class='fas fa-long-arrow-alt-right'></i>"], responsive: { 0: { items: 1 }, 650: { items: 2 }, 1000: { items: 4 } } });
 
@@ -7459,7 +7729,6 @@ $(document).ready(function () {
   $('nav ul li').click(function () {
     $(this).addClass("active").siblings().removeClass("active");
   });
-
 
   var sections = new theme.Sections();
 
